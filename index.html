@@ -56,12 +56,12 @@
 <body>
   <div class="container">
     <h1>Cek Cuaca</h1>
-    <input type="text" id="cityInput" placeholder="Masukkan nama daerah" />
+    <input type="text" id="cityInput" placeholder="Masukin nama daerah lu disini blog" />
     <br />
     <button onclick="getWeather()">Cari</button>
     <p id="result"></p>
   </div>
-  <footer>Developer: yaji</footer>
+  <footer>Developer: Yaji sigma</footer>
 
   <script>
     const apiKey = "eb336dfcd656225472e46307dd3aa00f";
@@ -91,7 +91,7 @@
         const res = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&lang=id&units=metric`
         );
-        if (!res.ok) throw new Error("Kota tidak ditemukan!");
+        if (!res.ok) throw new Error("Kota tidak ditemukan! masukin nama kota yang bener satt");
 
         const data = await res.json();
         const cuaca = data.weather[0].description;
