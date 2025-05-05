@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cek Cuaca</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: rgb(30, 30, 30);
+      transition: background-color 1s ease-in-out;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: 100px auto;
+      text-align: center;
+      color: white;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    input {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 5px;
+      background-color: #2196f3;
+      color: white;
+      font-size: 16px;
+    }
+    .loading {
+      font-style: italic;
+    }
+    .icon-img {
+      margin-top: 10px;
+      height: 60px;
+    }
+    footer {
+      position: fixed;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cek Cuaca</h1>
+    <input type="text" id="cityInput" placeholder="Masukkan nama daerah" />
+    <br />
+    <button onclick="getWeather()">Cari</button>
+    <p id="result"></p>
+  </div>
+  <footer>Developer: yaji</footer>
+
+  <script>
+    const apiKey = "eb336dfcd656225472e46307dd3aa00f";
+    const result = document.getElementById("result");
+
+    const badWords = ["kontol", "anjing", "bangsat", "goblok", "babi", "ngentot"];
+
+    function isBadWord(word) {
+      return badWords.includes(word.toLowerCase());
+    }
+
+    async function getWeather() {
+      const city = document.getElementById("cityInput").value.trim().toLowerCase();
+      if (!city) {
+        result.innerHTML = "Masukkan nama daerah dengan benar!";
+        return;
+      }
+
+      if (isBadWord(city)) {
+        result.innerHTML = `Kamu yang ${city}`;
+        return;
+      }
+
+      result.innerHTML = "<span class='loading'>Loading...</span>";
+
+      try {
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&lang=id&units=metric`
+        );
+        if (!res.ok) throw new Error("Kota tidak ditemukan!");
+
+        const data = await res.json();
+        const cuaca = data.weather[0].description;
+        const suhu = data.main.temp.toFixed(2);
+        const iconCode = data.weather[0].icon;
+        const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+        const timezoneOffset = data.timezone;
+        const utc = new Date().getTime() + new Date().getTimezoneOffset() * 60000;
+        const localTime = new Date(utc + timezoneOffset * 1000);
+        const formattedTime = localTime.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+        result.innerHTML = `
+          Cuaca di <strong>${city}</strong>: ${cuaca}, suhu ${suhu}°C<br>
+          Waktu lokal: ${formattedTime}<br>
+          <img src="${iconUrl}" alt="Cuaca" class="icon-img">
+        `;
+      } catch (err) {
+        result.innerHTML = "Gagal mengambil data: " + err.message;
+      }
+    }
+
+    const colors = [
+      "rgb(30, 30, 30)",
+      "rgb(50, 70, 100)",
+      "rgb(20, 50, 80)",
+      "rgb(60, 40, 90)",
+      "rgb(10, 80, 60)"
+    ];
+    let colorIndex = 0;
+    setInterval(() => {
+      document.body.style.backgroundColor = colors[colorIndex];
+      colorIndex = (colorIndex + 1) % colors.length;
+    }, 3000);
+  </script>
+</body>
+</html>
